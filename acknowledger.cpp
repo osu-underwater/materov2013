@@ -28,6 +28,8 @@ void setup() {
   Serial.begin(9600);
 }
 
+Serial.print("begin")
+
 void loop() {
   // if there's data available, read a packet
   int packetSize = Udp.parsePacket();
