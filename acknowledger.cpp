@@ -15,7 +15,7 @@ unsigned int localPort = 8888;      // local port to listen on
 // buffers for receiving and sending data
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
 char  ReplyBuffer[] = "acknowledged";       // a string to send back
-char foo = packetBuffer[0];
+char foo;
 
 // An EthernetUDP instance to let us send and receive packets over UDP
 EthernetUDP Udp;
@@ -25,49 +25,48 @@ void setup() {
   Ethernet.begin(mac,ip);
   Udp.begin(localPort);
 
-  Serial.begin(9600);
 }
-
-Serial.print("begin")
 
 void loop() {
   // if there's data available, read a packet
   int packetSize = Udp.parsePacket();
+  char Size[4];
   if(packetSize)
   {
-    Serial.print("Received packet of size ");
-    Serial.println(packetSize);
-    Serial.print("From ");
-    IPAddress remote = Udp.remoteIP();
-    for (int i =0; i < 4; i++)
+    if(packetSize == 4)
     {
-      Serial.print(remote[i], DEC);
-      if (i < 3)
+      IPAddress remote = Udp.remoteIP();
+    
+      // read the packet into packetBufffer
+      Udp.read(packetBuffer,UDP_TX_PACKET_MAX_SIZE);
+      char foo = packetBuffer[0];
+      pinMode(ledPin, OUTPUT);
+            
+      if (foo == 't')
       {
-        Serial.print(".");
+        digitalWrite(ledPin, HIGH);
       }
-    }
-    Serial.print(", port ");
-    Serial.println(Udp.remotePort());
+      else
+      {
+        digitalWrite(ledPin, LOW);
+      }
 
-    // read the packet into packetBufffer
-    Udp.read(packetBuffer,UDP_TX_PACKET_MAX_SIZE);
-    Serial.println("Contents:");
-    Serial.println(packetBuffer);
-        
-    if (foo == 't')
-    {
-      digitalWrite(ledPin, HIGH);
+      // send a reply, to the IP address and port that sent us the packet we received
+      itoa(packetSize, Size, 10);
+      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+      Udp.write(ReplyBuffer);
+      Udp.write(foo);
+      Udp.write(packetBuffer);
+      Udp.write(Size);
+      Udp.endPacket();
+    delay(1000);
     }
     else
     {
-      digitalWrite(ledPin, LOW);
+      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+      Udp.write("invalid input, please try again");
+      Udp.endPacket();
     }
-
-    // send a reply, to the IP address and port that sent us the packet we received
-    Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    Udp.write(ReplyBuffer);
-    Udp.endPacket();
   }
-  delay(10);
 }
+
