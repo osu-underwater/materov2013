@@ -12,6 +12,9 @@
 *.la
 *.a
 
+# Python stuff
+*.pyc
+
 
 # VIM swap files
 *.swp
