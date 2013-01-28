@@ -26,6 +26,7 @@ void setup() {
   pinMode(13,OUTPUT);
   pinMode(12,OUTPUT);
   pinMode(11,OUTPUT);
+  pinMode(10,OUTPUT);
 }
 
 void loop() {
@@ -56,21 +57,17 @@ void loop() {
       }
       else if (Command[0] == 'e')
       {
-        digitalWrite(11, HIGH);
+        digitalWrite(10, HIGH);
       }   
       else if (Command[0] == 'w')
       {
-        for (int i = 0; i < 256; i++)
-        {
-          analogWrite(11, i);
-          delay(100);
-        }
+        analogWrite(11, 65);
       }      
       else
       {
         digitalWrite(13, LOW);
         digitalWrite(12, LOW);
-        digitalWrite(11, LOW);
+        analogWrite(11, 0);
       }
 
       // send a reply, to the IP address and port that sent us the packet we received
