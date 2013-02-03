@@ -38,7 +38,7 @@ void loop()
     
       // read the packet into packetBufffer
       Udp.read(packetBuffer,UDP_TX_PACKET_MAX_SIZE);
-      unsigned int Speed = packetBuffer[0];
+      uint8_t Speed = packetBuffer[0];
       if (Speed > 254) 
         {
         Speed = 254;
@@ -50,7 +50,7 @@ void loop()
       analogWrite(11, Speed);
       // send a reply, to the IP address and port that sent us the packet we received
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      Udp.write(packetBuffer);
+      //Udp.write(packetBuffer);
       Udp.write(Speed);
       Udp.endPacket();
       }
