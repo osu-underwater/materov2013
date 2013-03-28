@@ -1,6 +1,8 @@
 #include <SPI.h>         // needed for Arduino versions later than 0018
 #include <Ethernet.h>
-#include <EthernetUdp.h>         // UDP library from: bjoern@cs.stanford.edu 12/30/2008
+#include <EthernetUdp.h> 
+#include <TimerOne.h>
+#include <TimerThree.h>
 
 
 // Enter a MAC address and IP address for your controller below.
@@ -20,6 +22,8 @@ EthernetUDP Udp;
 
 void setup() {
   // start the Ethernet and UDP:
+  Timer1.initialize(20000);
+  Timer3.initialize(20000);
   Ethernet.begin(mac,ip);
   Udp.begin(localPort);
   pinMode(11,OUTPUT);
@@ -38,10 +42,10 @@ void loop()
     
       // read the packet into packetBufffer
       Udp.read(packetBuffer,UDP_TX_PACKET_MAX_SIZE);
-      uint8_t Speed = packetBuffer[0];
-      if (Speed > 254) 
+      int Speed = atoi(packetBuffer);
+      if (Speed > 1023) 
         {
-        Speed = 254;
+        Speed = 1023;
         }
       if (Speed < 1) 
         {
@@ -50,7 +54,7 @@ void loop()
       analogWrite(11, Speed);
       // send a reply, to the IP address and port that sent us the packet we received
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      //Udp.write(packetBuffer);
+      Udp.write(packetBuffer);
       Udp.write(Speed);
       Udp.endPacket();
       }
